@@ -35,6 +35,7 @@ from turbinia.jobs import psort
 from turbinia.jobs import redis
 from turbinia.jobs import sshd
 from turbinia.jobs import strings
+from turbinia.jobs import static_creds
 from turbinia.jobs import tomcat
 from turbinia.jobs import volatility
 from turbinia.jobs import windows_acct

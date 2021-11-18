@@ -68,6 +68,7 @@ class TaskLoader():
       'PhotorecTask',
       'AbortTask',
       'CronAnalysisTask',
+      'StaticCredsTask',
   ]
 
   def check_task_name(self, task_name):
@@ -126,6 +127,7 @@ class TaskLoader():
     from turbinia.workers.bulk_extractor import BulkExtractorTask
     from turbinia.workers.photorec import PhotorecTask
     from turbinia.workers.abort import AbortTask
+    from turbinia.workers.static_creds import StaticCredsTask
 
     for task in self.TASK_LIST:
       if task.lower() == task_name.lower():

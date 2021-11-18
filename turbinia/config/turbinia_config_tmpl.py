@@ -204,6 +204,11 @@ DEPENDENCIES = [{
     'docker_image': None,
     'timeout': 3600
 }, {
+    'job': 'StaticCredsJob',
+    'programs': ['log2timeline.py', 'psort.py'],
+    'docker_image': None,
+    'timeout': 86400
+}, {
     'job': 'VolatilityJob',
     'programs': ['vol.py'],
     'docker_image': None,

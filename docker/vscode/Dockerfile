@@ -16,6 +16,7 @@ RUN pip install pylint yapf
 RUN pip install mock nose coverage tox
 
 # Install redis server
+RUN apt-get update
 RUN apt-get -y install redis-server curl vim
 # disable IPv6 in redis configuration
 RUN sed -i "s/bind .*/bind 127.0.0.1/g" /etc/redis/redis.conf
