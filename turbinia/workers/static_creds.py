@@ -65,9 +65,11 @@ class StaticCredsTask(TurbiniaTask):
 
     try:
       # First step - using log2timeline, run the yara rules against the evidence.
+      log.info("Running yara via log2timeline.....")
       self._run_log2timeline(evidence.local_path, plaso_file_path, result)
 
       # Second step - using psort, output the findings to something we can work with (easier than sqlite)
+      log.info("Log2timeline complete. psort'ing.....")
       self._run_psort(plaso_file_path, jsonl_file_path, result)
     except StaticCredsTaskException as e:
       log.error("Failure in StaticCredsTask: {0:s}".format(str(e)))
@@ -86,10 +88,19 @@ class StaticCredsTask(TurbiniaTask):
               findings[rule].append(parsed['filename'])
 
     if len(findings):
-      #TODO - write up the report
+      report = self._generate_report(findings)
+      output_evidence.text_data = report
+      result.report_priority = Priority.HIGH
+      result.report_data = report
 
+      # Write the report to the output file.
+      with open(output_file_path, 'wb') as fh:
+        fh.write(output_evidence.text_data.encode('utf-8'))
+
+      result.add_evidence(output_evidence, evidence.config)
       result.close(self, success=True, status='Possible static creds found')
     else:
+      result.report_priority = Priority.LOW
       result.close(self, success=True, status='No static creds found')
 
     return result
@@ -108,8 +119,9 @@ class StaticCredsTask(TurbiniaTask):
     cmd = [
         'log2timeline.py', '--yara_rules', YARA_FILE, '--parsers', 'filestat',
         '--unattended', '--partitions', 'all', '--storage_file', output_path,
-        src_path
+        '--hashers', 'none', src_path
     ]
+    log.info("Executing: {0:s}".format(" ".join(cmd)))
     ret, _ = self.execute(cmd, result, close=False)
 
     if ret:
@@ -127,7 +139,27 @@ class StaticCredsTask(TurbiniaTask):
       StaticCredsTaskException: If the psort fails.
     """
     cmd = ['psort.py', '-o', 'json_line', '-w', output_path, src_plaso]
+    log.info("Executing: {0:s}".format(" ".join(cmd)))
     ret, _ = self.execute(cmd, result, close=False)
 
     if ret:
       raise StaticCredsTaskException("psort failure.")
+
+  def _generate_report(self, findings):
+    """Generate the report text based on the task findings.
+    
+    Args:
+      findings (dict(str, list[str])) The generated findings of yara rule names
+        mapped to files.
+    Returns:
+      (str) The report data.
+        """
+    report = []
+
+    for rule in findings:
+      report.append(
+          "Match(es) for rule {0:s} found in the following files:".format(rule))
+      for file in findings[rule]:
+        report.append(fmt.bullet(file))
+
+    return "\n".join(report)
