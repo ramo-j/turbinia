@@ -2,7 +2,7 @@
 rule GCPServiceAccountCredential {
     meta:
         name = "GCP Service account credentials"
-		source = "https://github.com/stacscan/stacs-rules/blob/main/rules/credential/cloud/gcp/service_account.yar"
+        source = "https://github.com/stacscan/stacs-rules/blob/main/rules/credential/cloud/gcp/service_account.yar"
         retrieved = "20211123"
 
     strings:
@@ -31,19 +31,19 @@ rule GCPOAuthToken {
         $string2 = "\"refresh_token\"" nocase ascii wide
         $string3 = "apps.googleusercontent.com" nocase ascii wide
 
-	condition:
-		$string0 and $string1 and $string2 and $string3
+    condition:
+        $string0 and $string1 and $string2 and $string3
 }
 
 rule AWSAccessKeyPair {
-	meta:
+    meta:
         name = "AWS Access key Pair"
 
-	strings:
-		$string0 = /\bA(K|S)IA[A-Z0-9]{16}\b/ ascii wide
-		$string1 = /\b[a-zA-Z0-9\/+]{40}\b/ ascii wide
-	condition:
-		$string0 and $string1
+    strings:
+        $string0 = /\bA(K|S)IA[A-Z0-9]{16}\b/ ascii wide
+        $string1 = /\b[a-zA-Z0-9\/+]{40}\b/ ascii wide
+    condition:
+        $string0 and $string1
 }
 
 // TODO: Azure
@@ -85,8 +85,8 @@ rule GenericOAuthToken {
         $string2 = "\"refresh_token\"" nocase ascii wide
         $string3 = "apps.googleusercontent.com" nocase ascii wide
 
-	condition:
-		$string0 and $string1 and $string2 and not $string3
+    condition:
+        $string0 and $string1 and $string2 and not $string3
 }
 
 // Openssl/ssh plaintext keys
