@@ -52,12 +52,9 @@ class StaticCredsTask(TurbiniaTask):
       TurbiniaTaskResult object.
     """
     # Where to store the output files.
-    output_file_name = 'static_creds.txt'
-    output_file_path = os.path.join(self.output_dir, output_file_name)
-    plaso_file_name = 'out.plaso'
-    plaso_file_path = os.path.join(self.tmp_dir, plaso_file_name)
-    jsonl_file_name = 'out.jsonl'
-    jsonl_file_path = os.path.join(self.tmp_dir, jsonl_file_name)
+    output_file_path = os.path.join(self.output_dir, 'static_creds.txt')
+    plaso_file_path = os.path.join(self.tmp_dir, 'out.plaso')
+    jsonl_file_path = os.path.join(self.tmp_dir, 'out.jsonl')
 
     # What type of evidence we should output.
     findings = {}
@@ -118,8 +115,9 @@ class StaticCredsTask(TurbiniaTask):
     """
     cmd = [
         'log2timeline.py', '--yara_rules', YARA_FILE, '--parsers', 'filestat',
-        '--unattended', '--partitions', 'all', '--storage_file', output_path,
-        '--hashers', 'none', src_path
+        '--unattended', '--partitions', 'all', '--volumes', 'all',
+        '--storage_file', output_path, '--hashers', 'none', '--status_view',
+        'none', src_path
     ]
     log.info("Executing: {0:s}".format(" ".join(cmd)))
     ret, _ = self.execute(cmd, result, close=False)
@@ -138,7 +136,10 @@ class StaticCredsTask(TurbiniaTask):
     Raises:
       StaticCredsTaskException: If the psort fails.
     """
-    cmd = ['psort.py', '-o', 'json_line', '-w', output_path, src_plaso]
+    cmd = [
+        'psort.py', '--status_view', 'none', '-o', 'json_line', '-w',
+        output_path, src_plaso
+    ]
     log.info("Executing: {0:s}".format(" ".join(cmd)))
     ret, _ = self.execute(cmd, result, close=False)
 
